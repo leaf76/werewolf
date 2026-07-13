@@ -77,10 +77,15 @@ if (res.status !== 201) fail(`POST /api/rooms -> ${res.status}`);
 const { code } = await res.json();
 ok(`room created: ${code}`);
 
-// --- Six players join; everyone sees the roster.
-const players = Array.from({ length: 6 }, (_, i) => connect(code, `E2E-${i + 1}`));
-for (const p of players) await p.until("room_state");
-ok("six players seated");
+// --- Six players join one at a time: over a real network, concurrent
+// sockets race and the host would be whoever handshakes first.
+const players = [];
+for (let i = 1; i <= 6; i++) {
+  const p = connect(code, `E2E-${i}`);
+  await p.until("room_state"); // seat confirmed before the next player knocks
+  players.push(p);
+}
+ok("six players seated (E2E-1 is host)");
 
 // --- Start; discover the cast.
 players[0].send({ type: "start_game", revealOnDeath: true });

@@ -4,6 +4,13 @@
 Cloudflare Workers 做邊緣路由、**每間房一個 Durable Object** 持有權威遊戲狀態、
 WebSocket（Hibernation API）即時廣播，前端是原生 HTML/CSS/TypeScript（無框架）。
 
+## 線上玩
+
+➡️ **https://werewolf-demo.leafxc0903.workers.dev**
+
+建房 → 複製邀請連結給朋友（6–12 人）。人不夠可以用 bot 補位：
+`node scripts/bots.mjs <房號> 4 wss://werewolf-demo.leafxc0903.workers.dev`
+
 ## 玩法規則
 
 - 6–12 人；狼人數依人數（6–8 人 2 狼、9–11 人 3 狼、12 人 4 狼）
