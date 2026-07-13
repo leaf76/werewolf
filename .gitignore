@@ -1,0 +1,5 @@
+node_modules/
+.wrangler/
+public/client.js
+worker-configuration.d.ts
+.DS_Store

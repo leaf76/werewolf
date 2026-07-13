@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>線上多人狼人殺</title>
+<meta name="description" content="Claude Code 課程 demo：Cloudflare Workers + Durable Objects 的即時多人狼人殺。">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<main class="landing">
+  <p class="kicker">CLAUDE CODE DEMO · WORKERS + DURABLE OBJECTS</p>
+  <h1>線上多人<span class="acc">狼人殺</span></h1>
+  <p class="sub">建一間房，把連結丟給朋友，6–12 人開局。<br>狼人、預言家與平民 —— 一夜一日，投票放逐，直到分出勝負。</p>
+
+  <div class="landing-actions">
+    <button id="create" class="btn-primary" type="button">建立房間</button>
+    <form id="join-form" autocomplete="off">
+      <input id="join-code" name="code" inputmode="latin" maxlength="6" placeholder="輸入 6 碼房號" aria-label="房號">
+      <button class="btn-ghost" type="submit">加入</button>
+    </form>
+  </div>
+  <p id="landing-err" class="err" hidden></p>
+
+  <footer class="landing-foot">每間房是一個 Durable Object · WebSocket 即時同步 · 伺服器權威判定</footer>
+</main>
+
+<script type="module">
+  const err = document.getElementById("landing-err");
+  const showErr = (text) => { err.textContent = text; err.hidden = false; };
+
+  document.getElementById("create").addEventListener("click", async (event) => {
+    const btn = event.currentTarget;
+    btn.disabled = true;
+    try {
+      const res = await fetch("/api/rooms", { method: "POST" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const { code } = await res.json();
+      location.href = `/r/${code}`;
+    } catch {
+      showErr("建立房間失敗，請再試一次。");
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById("join-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const code = document.getElementById("join-code").value.trim().toUpperCase();
+    if (!/^[A-Z0-9]{6}$/.test(code)) { showErr("房號是 6 碼英數字。"); return; }
+    location.href = `/r/${code}`;
+  });
+</script>
+</body>
+</html>

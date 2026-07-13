@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>狼人殺 · 房間</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<main class="room">
+
+  <header class="topbar">
+    <a class="brand" href="/">狼人殺</a>
+    <span class="room-code">房號 <strong id="room-code">——</strong></span>
+    <button id="copy-link" class="btn-ghost small" type="button">複製邀請連結</button>
+    <span id="spec-badge" class="spec-badge" hidden>旁觀中</span>
+    <span id="conn" class="conn" data-state="connecting">連線中…</span>
+  </header>
+
+  <!-- 進場：取暱稱 -->
+  <section id="gate" class="panel gate">
+    <h2>取個名字進場</h2>
+    <form id="gate-form" autocomplete="off">
+      <input id="gate-name" maxlength="12" placeholder="你的暱稱（最多 12 字）" aria-label="暱稱">
+      <button class="btn-primary" type="submit">進入房間</button>
+    </form>
+    <p id="gate-err" class="err" hidden></p>
+  </section>
+
+  <!-- 房間不存在 / 無法加入 -->
+  <section id="dead-end" class="panel gate" hidden>
+    <h2 id="dead-end-title">找不到這間房</h2>
+    <p id="dead-end-text" class="sub"></p>
+    <a class="btn-primary" href="/">回首頁建一間</a>
+  </section>
+
+  <!-- 主畫面 -->
+  <section id="stage" hidden>
+    <div class="status-row">
+      <div id="phase-banner" class="phase" data-phase="lobby">大廳</div>
+      <span id="countdown" class="countdown" hidden></span>
+      <div id="status-line" class="status"></div>
+    </div>
+
+    <div id="role-card" class="role-card" hidden>
+      <span class="role-label">你的身分</span>
+      <strong id="role-name">？</strong>
+      <span id="role-extra"></span>
+    </div>
+
+    <div id="witch-panel" class="witch-panel" hidden>
+      <p id="witch-text"></p>
+      <div class="witch-actions">
+        <button id="witch-save" class="btn-primary" type="button">用解藥</button>
+        <button id="witch-poison" class="btn-ghost" type="button">用毒藥（點選目標）</button>
+        <button id="witch-skip" class="btn-ghost" type="button">跳過</button>
+      </div>
+    </div>
+
+    <div id="players" class="players" role="group" aria-label="玩家"></div>
+
+    <div id="hunt-actions" class="hunt-actions" hidden>
+      <span class="hint">你是獵人，倒下前可以開最後一槍：點選要帶走的人，或</span>
+      <button id="hunt-pass" class="btn-ghost small" type="button">收槍不開</button>
+    </div>
+
+    <div class="lobby-actions" id="lobby-actions">
+      <button id="start" class="btn-primary" type="button" disabled>開始遊戲</button>
+      <label id="reveal-wrap" class="hint reveal-wrap" hidden>
+        <input type="checkbox" id="reveal-opt"> 死亡亮牌
+      </label>
+      <span id="start-hint" class="hint"></span>
+    </div>
+
+    <div class="bottom">
+      <div class="log-wrap">
+        <h3>事件</h3>
+        <ul id="log" class="log" aria-live="polite"></ul>
+      </div>
+      <div class="chat-wrap">
+        <h3>聊天</h3>
+        <ul id="chat" class="log chat"></ul>
+        <form id="chat-form" autocomplete="off">
+          <input id="chat-text" maxlength="200" placeholder="白天與大廳可以發言…" aria-label="聊天訊息">
+          <button class="btn-ghost small" type="submit">送出</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- 終局 -->
+  <div id="gameover" class="overlay" hidden>
+    <div class="panel result">
+      <p class="kicker">GAME OVER</p>
+      <h2 id="winner-line">——</h2>
+      <ul id="reveal" class="reveal"></ul>
+      <div class="result-actions">
+        <button id="restart" class="btn-primary" type="button" hidden>同房再來一局</button>
+        <a class="btn-ghost" href="/">再開一間房</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+</main>
+
+<script type="module" src="/client.js"></script>
+</body>
+</html>
