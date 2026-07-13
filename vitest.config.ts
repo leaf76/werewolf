@@ -1,17 +1,14 @@
-import { defineWorkersConfig } from "@cloudflare/vitest-pool-workers/config";
+import { cloudflareTest } from "@cloudflare/vitest-pool-workers";
+import { defineConfig } from "vitest/config";
 
-export default defineWorkersConfig({
-  test: {
-    poolOptions: {
-      workers: {
-        // Per-test isolated storage chokes on the .sqlite-shm sidecar files of
-        // SQLite-backed Durable Objects (see vitest-integration known issues).
-        // Tests share one storage instead; every test allocates its own room
-        // code, so nothing leaks between them.
-        isolatedStorage: false,
-        singleWorker: true,
-        wrangler: { configPath: "./wrangler.jsonc" },
-      },
-    },
-  },
+// vitest-pool-workers for Vitest 4 replaced the pool + poolOptions.workers
+// setup with this plugin and dropped the isolatedStorage / singleWorker
+// switches. These tests never relied on per-test isolation: every test
+// allocates its own room code, so nothing leaks between them.
+export default defineConfig({
+  plugins: [
+    cloudflareTest({
+      wrangler: { configPath: "./wrangler.jsonc" },
+    }),
+  ],
 });
