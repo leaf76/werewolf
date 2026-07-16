@@ -79,6 +79,10 @@ npm run deploy     # 需要先 wrangler login
 - 角色**只單獨送給本人**；狼人隊友與刀向只送狼人；查驗結果只送預言家；
   女巫的睜眼資訊只送女巫；廣播的 `room_state` 不含任何身分
   （「死亡亮牌」開啟時，僅已出局玩家的身分公開）
+- **座位憑證**：`playerId` 是公開識別（出現在 `room_state`），但重連／回座位必須帶
+  server 在入座時 unicast 的 `secret`（存在瀏覽器 `sessionStorage`）。
+  只有公開的 `playerId` **不能**冒充他人；錯誤 secret 也不會踢掉合法連線。
+  旁觀者使用 server 配發的 id，不能拿別人的 `playerId` 把在座玩家踢下線。
 - 所有動作在 DO 內驗證：階段、身分、存活、目標合法性 —— **deny by default**，
   未授權動作一律回 `error`；旁觀者無法做任何遊戲動作
 - 聊天有長度上限與**頻率限制**（token bucket，5 則 / 每 2 秒回填一則）
@@ -87,6 +91,13 @@ npm run deploy     # 需要先 wrangler login
 
 ## 已知取捨（demo 範圍）
 
+- 這是**課程示範**，不是對抗惡意玩家的產品級對戰平台：建房 API 無全局限流、
+  聊天限流是 per-socket（重開連線可重置）、沒有 CAPTCHA／登入。
+  公開部署請自備 Cloudflare rate limit / WAF，或僅在課堂時段開服務。
 - 勝負只算「屠城」（同數即勝），沒有屠邊規則
 - 沒有警長、白痴、邱比特等進階配置；沒有排行榜與資料庫（依 prompt 列為非目標）
 - 女巫首夜可自救、狼人可自刀（配合女巫解藥是合法戰術）；預言家不能驗自己
+
+## License
+
+MIT — see [LICENSE](./LICENSE).

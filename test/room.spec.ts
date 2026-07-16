@@ -28,6 +28,8 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 interface Client {
   id: string;
+  /** Server-issued seat secret; required to rebind this playerId. */
+  secret: string;
   send(msg: ClientMessage): void;
   until<T extends MsgType>(type: T, timeoutMs?: number): Promise<MsgOf<T>>;
   seen: ServerMessage[];
@@ -68,6 +70,7 @@ async function connect(code: string, id: string): Promise<Client> {
 
   return {
     id,
+    secret: "",
     seen,
     send: (msg) => ws.send(JSON.stringify(msg)),
     until: async <T extends MsgType>(type: T, timeoutMs = 3000): Promise<MsgOf<T>> => {
@@ -89,9 +92,18 @@ async function createRoom(): Promise<string> {
   return body.code;
 }
 
-async function join(code: string, playerId: string, name: string): Promise<Client> {
+async function join(code: string, playerId: string, name: string, secret?: string): Promise<Client> {
   const client = await connect(code, playerId);
-  client.send({ type: "join", playerId, name });
+  client.send({
+    type: "join",
+    playerId,
+    name,
+    ...(secret ? { secret } : {}),
+  });
+  const session = await client.until("session");
+  expect(session.playerId).toBe(playerId);
+  expect(session.secret.length).toBeGreaterThan(8);
+  client.secret = session.secret;
   await client.until("room_state");
   return client;
 }
@@ -389,7 +401,7 @@ describe("reconnection", () => {
     await w1.until("action_ack");
     w1.close();
 
-    const back = await join(code, w1.id, "回歸的狼");
+    const back = await join(code, w1.id, "回歸的狼", w1.secret);
     const assigned = await back.until("role_assigned");
     expect(assigned.role).toBe("werewolf");
     expect(assigned.teammates.map((t) => t.id)).toEqual([w2.id]);
@@ -406,6 +418,40 @@ describe("reconnection", () => {
     const me = state.state.players.find((p) => p.id === w1.id)!;
     expect(me.alive).toBe(true);
     expect(me.name).toBe(`玩家${1 + clients.indexOf(w1)}`);
+  });
+
+  it("rejects seat theft via public playerId without the secret", async () => {
+    const code = await createRoom();
+    const alice = await join(code, "alice-000000", "小明");
+
+    const thief = await connect(code, "thief");
+    thief.send({ type: "join", playerId: "alice-000000", name: "冒充者" });
+    expect((await thief.until("error")).code).toBe("bad_session");
+    expect(thief.seen.some((m) => m.type === "session")).toBe(false);
+    expect(thief.seen.some((m) => m.type === "room_state")).toBe(false);
+
+    // Wrong secret must not kick the legitimate seat.
+    alice.send({ type: "chat", text: "我還在" });
+    const chat = await alice.until("chat");
+    expect(chat.from).toBe("小明");
+    expect(chat.text).toBe("我還在");
+  });
+
+  it("cannot kick a seated player by joining with their public playerId mid-game", async () => {
+    const { code, clients } = await sixPlayerRoom();
+    await startAndDiscoverRoles(clients);
+    const target = clients[0]!;
+
+    // Old attack: claim the public playerId after start → spectator + replaceSockets.
+    // Now any join for an occupied seat without the secret is hard-rejected first.
+    const spoof = await connect(code, "spoof");
+    spoof.send({ type: "join", playerId: target.id, name: "假旁觀" });
+    expect((await spoof.until("error")).code).toBe("bad_session");
+    expect(spoof.seen.some((m) => m.type === "spectate")).toBe(false);
+
+    // Legitimate seat still receives replies (wrong_phase on a day vote at night).
+    target.send({ type: "vote", targetId: clients[1]!.id });
+    expect((await target.until("error")).code).toBe("wrong_phase");
   });
 });
 

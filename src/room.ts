@@ -63,6 +63,12 @@ export class RoomDO extends DurableObject<Env> {
   private game: g.GameState | null = null;
   private timers: TimerConfig = DEFAULT_TIMERS;
   private deadlines: Deadlines = { phaseAt: null, cleanupAt: 0 };
+  /**
+   * Per-seat session secrets (playerId -> secret). Kept out of GameState so
+   * they can never ride along accidental public snapshots. Survives rematch;
+   * wiped with the room on teardown.
+   */
+  private secrets: Record<string, string> = {};
   /** In-memory flood buckets; reset by hibernation, which is fine. */
   private chatBuckets = new WeakMap<WebSocket, { tokens: number; last: number }>();
 
@@ -74,6 +80,7 @@ export class RoomDO extends DurableObject<Env> {
       this.timers = (await ctx.storage.get<TimerConfig>("timer-config")) ?? DEFAULT_TIMERS;
       this.deadlines =
         (await ctx.storage.get<Deadlines>("deadlines")) ?? { phaseAt: null, cleanupAt: 0 };
+      this.secrets = (await ctx.storage.get<Record<string, string>>("secrets")) ?? {};
     });
   }
 
@@ -218,21 +225,44 @@ export class RoomDO extends DurableObject<Env> {
 
   // ---------- message handlers ----------
 
-  private async onJoin(ws: WebSocket, msg: { playerId?: unknown; name?: unknown }): Promise<void> {
+  private async onJoin(
+    ws: WebSocket,
+    msg: { playerId?: unknown; name?: unknown; secret?: unknown },
+  ): Promise<void> {
     const game = this.game!;
     const playerId = typeof msg.playerId === "string" ? msg.playerId : "";
     const name = typeof msg.name === "string" ? msg.name.trim() : "";
+    const secret = typeof msg.secret === "string" ? msg.secret : "";
     if (!PLAYER_ID_RE.test(playerId) || name.length === 0 || name.length > MAX_NAME_LEN) {
       this.sendError(ws, "bad_message", "invalid playerId or name");
+      return;
+    }
+
+    // Rebind of an existing seat: the public playerId alone is not enough —
+    // the server-issued secret must match. Wrong/missing secret never kicks
+    // the legitimate connection (no replaceSockets on failure).
+    const existing = game.players.find((p) => p.id === playerId);
+    if (existing) {
+      if (!secret || this.secrets[playerId] !== secret) {
+        this.sendError(ws, "bad_session", "invalid or missing seat secret");
+        return;
+      }
+      this.replaceSockets(ws, playerId);
+      ws.serializeAttachment({ playerId } satisfies Attachment);
+      await this.touchCleanup();
+      this.send(ws, { type: "session", playerId, secret: this.secrets[playerId]! });
+      this.broadcastRoomState();
+      this.sendPrivateSnapshot(ws, existing);
       return;
     }
 
     const res = g.joinPlayer(game, playerId, name);
     if (!res.ok) {
       if (res.code === "room_full" || res.code === "game_started") {
-        // No seat for you — but you are welcome to watch.
-        this.replaceSockets(ws, playerId);
-        ws.serializeAttachment({ playerId, spectator: true } satisfies Attachment);
+        // Spectator: server-minted id so a client cannot kick a seated player
+        // by reusing their public playerId on the spectator path.
+        const specId = crypto.randomUUID();
+        ws.serializeAttachment({ playerId: specId, spectator: true } satisfies Attachment);
         this.send(ws, { type: "spectate" });
         this.send(ws, { type: "room_state", state: this.publicState() });
         if (game.phase === "ended" && game.winner) {
@@ -245,10 +275,15 @@ export class RoomDO extends DurableObject<Env> {
       return;
     }
 
+    const granted = crypto.randomUUID();
+    this.secrets[playerId] = granted;
+    await this.ctx.storage.put("secrets", this.secrets);
+
     this.replaceSockets(ws, playerId);
     ws.serializeAttachment({ playerId } satisfies Attachment);
     await this.persist();
     await this.touchCleanup();
+    this.send(ws, { type: "session", playerId, secret: granted });
     this.broadcastRoomState();
     this.sendPrivateSnapshot(ws, res.value);
   }

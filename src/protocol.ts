@@ -53,7 +53,13 @@ export interface VoteReveal {
 // ---------- client -> server ----------
 
 export type ClientMessage =
-  | { type: "join"; playerId: string; name: string }
+  /**
+   * Claim or rebind a seat. `playerId` is public (shown in room_state);
+   * `secret` is the private session token issued by the server on first seat
+   * and required for every subsequent rebind. Without a valid secret, an
+   * existing seat cannot be stolen by copying a public playerId.
+   */
+  | { type: "join"; playerId: string; name: string; secret?: string }
   | { type: "start_game"; revealOnDeath?: boolean }
   | { type: "night_action"; action: "kill" | "inspect" | "poison"; targetId: string }
   | { type: "night_action"; action: "save" | "skip" }
@@ -74,6 +80,11 @@ export interface RoleReveal {
 
 export type ServerMessage =
   | { type: "room_state"; state: PublicRoomState }
+  /**
+   * Unicast seat credentials. Store `secret` client-side; it is never
+   * broadcast and is required to rejoin this seat after a disconnect.
+   */
+  | { type: "session"; playerId: string; secret: string }
   /**
    * Unicast to the player only; wolves also get their teammate list and the
    * witch gets her remaining potions.

@@ -47,6 +47,7 @@ const ERROR_TEXT: Record<string, string> = {
   runoff_candidate: "你是決選候選人，本輪不能投票。",
   rate_limited: "說話太快了，稍等一下再送。",
   bad_message: "訊息格式錯誤。",
+  bad_session: "這個座位的憑證無效（無法用公開的 playerId 冒充他人）。",
   unknown_message: "不支援的訊息。",
   room_gone: "房間不存在或已關閉。",
   room_closed: "房間已因閒置太久而關閉。",
@@ -62,11 +63,14 @@ function el<T extends HTMLElement>(id: string): T {
 
 const code = (location.pathname.split("/").pop() ?? "").toUpperCase();
 const PID_KEY = `ww-pid:${code}`;
+const SECRET_KEY = `ww-secret:${code}`;
 const NAME_KEY = `ww-name:${code}`;
 
 // sessionStorage (not localStorage) on purpose: a refresh keeps the seat,
 // while separate tabs in the same browser can play as different players —
 // which is exactly how the two-tab demo works.
+// playerId is public (appears in room_state); secret is the server-issued
+// token required to rebind this seat — never share it, never put it in URLs.
 function myPlayerId(): string {
   let id = sessionStorage.getItem(PID_KEY);
   if (!id) {
@@ -77,6 +81,7 @@ function myPlayerId(): string {
 }
 
 const playerId = myPlayerId();
+let mySecret = sessionStorage.getItem(SECRET_KEY) ?? "";
 let myName = sessionStorage.getItem(NAME_KEY) ?? "";
 
 let ws: WebSocket | null = null;
@@ -221,7 +226,12 @@ function connect(): void {
     conn.dataset.state = "open";
     conn.textContent = "已連線";
     reconnectAttempts = 0;
-    send({ type: "join", playerId, name: myName });
+    send({
+      type: "join",
+      playerId,
+      name: myName,
+      ...(mySecret ? { secret: mySecret } : {}),
+    });
   });
 
   ws.addEventListener("message", (event) => {
@@ -280,6 +290,11 @@ function send(msg: ClientMessage): void {
 
 function handle(msg: ServerMessage): void {
   switch (msg.type) {
+    case "session":
+      mySecret = msg.secret;
+      sessionStorage.setItem(SECRET_KEY, msg.secret);
+      return;
+
     case "room_state":
       state = msg.state;
       gate.hidden = true;
