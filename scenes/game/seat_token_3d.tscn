@@ -1,0 +1,92 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/game/seat_token_3d.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/characters/shape/alive.png" id="2"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ring"]
+top_radius = 0.38
+bottom_radius = 0.38
+height = 0.03
+radial_segments = 24
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ring"]
+transparency = 1
+albedo_color = Color(1, 0.85, 0.2, 0.55)
+emission_enabled = true
+emission = Color(1, 0.8, 0.15, 1)
+emission_energy_multiplier = 1.4
+roughness = 1.0
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
+radius = 0.35
+height = 1.1
+
+[sub_resource type="QuadMesh" id="QuadMesh_bubble"]
+size = Vector2(1.35, 0.55)
+
+[node name="SeatToken3D" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Ring" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+mesh = SubResource("CylinderMesh_ring")
+surface_material_override/0 = SubResource("StandardMaterial3D_ring")
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+pixel_size = 0.012
+billboard = 2
+shaded = true
+alpha_cut = 1
+texture_filter = 1
+texture = ExtResource("2")
+
+[node name="NameLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
+pixel_size = 0.008
+billboard = 1
+modulate = Color(1, 0.95, 0.85, 1)
+outline_modulate = Color(0, 0, 0, 0.9)
+text = "Name"
+font_size = 28
+outline_size = 8
+
+[node name="MetaLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
+pixel_size = 0.007
+billboard = 1
+modulate = Color(0.9, 0.85, 0.7, 1)
+outline_modulate = Color(0, 0, 0, 0.85)
+text = ""
+font_size = 20
+outline_size = 6
+
+[node name="Bubble" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.15, 0)
+visible = false
+
+[node name="BubbleBg" type="MeshInstance3D" parent="Bubble"]
+mesh = SubResource("QuadMesh_bubble")
+
+[node name="BubbleLabel" type="Label3D" parent="Bubble"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.02)
+pixel_size = 0.0065
+billboard = 1
+modulate = Color(0.15, 0.12, 0.1, 1)
+outline_modulate = Color(1, 1, 1, 0.35)
+text = "…"
+font_size = 22
+outline_size = 4
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+width = 200.0
+
+[node name="Area3D" type="Area3D" parent="."]
+input_ray_pickable = true
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+shape = SubResource("CapsuleShape3D_1")
