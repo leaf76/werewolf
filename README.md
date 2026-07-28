@@ -1,10 +1,11 @@
-# 狼人殺 · Godot 4 Client（2D）
+# 狼人殺 · Godot 4 Client（2.5D）
 
 對接 [leaf76/werewolf-demo](https://github.com/leaf76/werewolf-demo) 的 **既有 WebSocket 協定**。  
 **規則 / 房間 / 身分保密仍由 Cloudflare Workers + Durable Object 權威處理**；  
 Godot 做 **2.5D 圓桌客戶端**（3D 桌面 + 廣告牌像素人、日夜燈光、HUD + 送意圖）。
 
-開源素材說明見 [`assets/ASSETS.md`](assets/ASSETS.md)。
+開源素材說明見 [`assets/ASSETS.md`](assets/ASSETS.md)。  
+本機逐步操作見 [`STEPS.md`](STEPS.md)。
 
 ## 架構
 
@@ -17,22 +18,37 @@ Godot 4 (本專案)  --HTTP-->  POST /api/rooms, GET /api/rooms/:code
 
 | 模組 | 職責 |
 |------|------|
-| `scripts/protocol.gd` | 常數、中文錯誤/角色名 |
+| `scripts/autoload/protocol.gd` | 常數、中文錯誤/角色名 |
 | `scripts/autoload/net.gd` | HTTP + `WebSocketPeer` |
 | `scripts/autoload/game_state.gd` | 狀態鏡像、join/重連/secret、意圖 API |
+| `scripts/autoload/sfx.gd` | 輕量音效 |
 | `scenes/main.tscn` | 建房 / 入房 |
-| `scenes/room.tscn` | 對局 UI |
+| `scenes/room.tscn` | 對局 HUD + `table_world_3d` |
+| `scenes/game/table_world_3d.tscn` | 3D 圓桌、燈光、座位 |
+| `scenes/game/seat_token_3d.tscn` | Sprite3D 廣告牌座位 |
 
 ## 需求
 
-- Godot **4.2+**（建議 4.3 / 4.4）
+- Godot **4.7**（`project.godot` features；4.2+ 理論可開，以 4.7 為準）
 - 可連到後端（預設正式 demo，或本機 `wrangler dev`）
 
 ## 開啟專案
 
-1. 安裝 [Godot 4](https://godotengine.org/download)
+1. 安裝 [Godot 4.7](https://godotengine.org/download)
 2. Project → Import → 選本目錄的 `project.godot`
 3. 按 F5 執行
+
+本機路徑範例：
+
+```text
+/Users/cy76/WorkSpace/sideProject/game_projects/werewolf-godot
+```
+
+後端同機路徑：
+
+```text
+/Users/cy76/WorkSpace/sideProject/learn_projects/werewolf-demo
+```
 
 ## 本機對接 werewolf-demo 後端
 
@@ -63,7 +79,7 @@ node scripts/bots.mjs <房號> 5 ws://localhost:8787
 | `WebSocket` | `Net` + `WebSocketPeer` |
 | `handle(msg)` | `GameState.handle_server_message` |
 | `send({ type })` | `GameState.send_*` / `Net.send_message` |
-| DOM render | `room.gd` `_render*` |
+| DOM render | `room.gd` `_render*` + 3D seats |
 
 Client → Server 訊息（勿改欄位名，後端吃 camelCase）：
 
@@ -76,8 +92,8 @@ Client → Server 訊息（勿改欄位名，後端吃 camelCase）：
 
 ## 建議開發順序
 
-1. **現在**：用桌面 export 連正式 / 本機後端，打通完整一局  
-2. **UI**：座位改成圓桌場景、夜/晝主題、角色立繪  
+1. **現在**：桌面執行連正式 / 本機後端，打通完整一局  
+2. **UI**：座位動畫、夜/晝、角色立繪  
 3. **多平台**：Windows / Android；Web 匯出需注意 CORS 與包體  
 4. **（可選）後端 Godot 化**：只有當你不要 Cloudflare 時才做；工作量 ≈ 重寫 DO
 
@@ -86,6 +102,10 @@ Client → Server 訊息（勿改欄位名，後端吃 camelCase）：
 - 不在 client 發牌、算票、判勝負  
 - 不信任本地「我是狼所以…」——只顯示 unicast（`role_assigned` / `seer_result` / `witch_wake` / `wolf_pick`）
 
+## 工具腳本
+
+見 [`tools/`](tools/)（headless create smoke、Windows e2e 輔助）。
+
 ## License
 
-與 demo 相同可自訂；骨架供你繼續開發。
+與 demo 相同可自訂；骨架供你繼續開發。Kenney CC0 素材見 `assets/ASSETS.md`。

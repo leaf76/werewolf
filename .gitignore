@@ -20,5 +20,6 @@ e2e_result.txt
 mcp_test.*
 *.log
 
-# Source archives (extracted assets under assets/ are tracked)
+# Source archives (do not commit full Kenney packs)
 *.zip
+assets/kenney/

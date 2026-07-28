@@ -4,14 +4,18 @@
 
 ## 第 0 步：用 Godot 打開專案（現在）
 
-1. 開啟 `Godot_v4.7.1-stable_win64.exe`
+1. 開啟 **Godot 4.7**
 2. **Import** → 選資料夾  
-   `C:\Users\doxc_\Workspace\werewolf-godot`
+
+```text
+/Users/cy76/WorkSpace/sideProject/game_projects/werewolf-godot
+```
+
 3. 選中 `project.godot` → Import & Edit
 4. 按 **F5**（或右上角 ▶ Play）
 5. 應看到大廳：**狼人殺 · Godot Client**
 
-若編輯器下方 **Debugger** 出現紅色錯誤，把文字貼給我。
+若編輯器下方 **Debugger** 出現紅色錯誤，把文字貼給協助者。
 
 ---
 
@@ -28,7 +32,7 @@
 
 失敗常見原因：
 - 沒網路 / 防火牆擋 HTTPS
-- 狀態列顯示 `HTTP 失敗` → 貼給我
+- 狀態列顯示 `HTTP 失敗` → 記錄錯誤訊息
 
 ---
 
@@ -53,7 +57,7 @@ Project → Run Multiple Instances → 2 → F5
 在本機有 `werewolf-demo` 時：
 
 ```sh
-cd <werewolf-demo 路徑>
+cd /Users/cy76/WorkSpace/sideProject/learn_projects/werewolf-demo
 node scripts/bots.mjs <房號> 5 wss://werewolf-demo.leafxc0903.workers.dev
 ```
 
@@ -87,7 +91,7 @@ node scripts/bots.mjs <房號> 5 wss://werewolf-demo.leafxc0903.workers.dev
 ## 本機後端（可選）
 
 ```sh
-# werewolf-demo
+cd /Users/cy76/WorkSpace/sideProject/learn_projects/werewolf-demo
 npm run dev
 ```
 
