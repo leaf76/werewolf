@@ -1,4 +1,4 @@
-## 2.5D seat: Kenney Shape Character with idle bob, walk tween, speech bubble.
+## 2.5D seat: Kenney Roguelike Character with idle bob, walk tween, speech bubble.
 class_name SeatToken3D
 extends Node3D
 
@@ -26,23 +26,26 @@ var _move_tween: Tween
 var _bubble_tween: Tween
 var _bubble_timer: float = 0.0
 
-const TEX_ME := preload("res://assets/characters/shape/me.png")
-const TEX_DEAD := preload("res://assets/characters/shape/dead.png")
-const TEX_WOLF := preload("res://assets/characters/shape/wolf_ally.png")
+## World height ≈ texture_h * pixel_size (128px * 0.017 ≈ 2.18, near old Shape seats).
+const SEAT_PIXEL_SIZE := 0.017
+
+const TEX_ME := preload("res://assets/characters/roguelike/me.png")
+const TEX_DEAD := preload("res://assets/characters/roguelike/dead.png")
+const TEX_WOLF := preload("res://assets/characters/roguelike/wolf_ally.png")
 
 const POOL: Array[Texture2D] = [
-	preload("res://assets/characters/shape/player_blue_a.png"),
-	preload("res://assets/characters/shape/player_green_b.png"),
-	preload("res://assets/characters/shape/player_pink_c.png"),
-	preload("res://assets/characters/shape/player_purple_d.png"),
-	preload("res://assets/characters/shape/player_red_e.png"),
-	preload("res://assets/characters/shape/player_yellow_f.png"),
-	preload("res://assets/characters/shape/player_blue_c.png"),
-	preload("res://assets/characters/shape/player_green_d.png"),
-	preload("res://assets/characters/shape/player_pink_a.png"),
-	preload("res://assets/characters/shape/player_purple_b.png"),
-	preload("res://assets/characters/shape/player_red_f.png"),
-	preload("res://assets/characters/shape/player_yellow_a.png"),
+	preload("res://assets/characters/roguelike/player_00.png"),
+	preload("res://assets/characters/roguelike/player_01.png"),
+	preload("res://assets/characters/roguelike/player_02.png"),
+	preload("res://assets/characters/roguelike/player_03.png"),
+	preload("res://assets/characters/roguelike/player_04.png"),
+	preload("res://assets/characters/roguelike/player_05.png"),
+	preload("res://assets/characters/roguelike/player_06.png"),
+	preload("res://assets/characters/roguelike/player_07.png"),
+	preload("res://assets/characters/roguelike/player_08.png"),
+	preload("res://assets/characters/roguelike/player_09.png"),
+	preload("res://assets/characters/roguelike/player_10.png"),
+	preload("res://assets/characters/roguelike/player_11.png"),
 ]
 
 
@@ -52,8 +55,9 @@ func _ready() -> void:
 	area.mouse_entered.connect(_on_hover.bind(true))
 	area.mouse_exited.connect(_on_hover.bind(false))
 	sprite.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
-	sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR
-	sprite.pixel_size = 0.012
+	# Nearest keeps 16px Kenney pixels crisp after upscale.
+	sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	sprite.pixel_size = SEAT_PIXEL_SIZE
 	sprite.shaded = true
 	sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_OPAQUE_PREPASS
 	ring.visible = false

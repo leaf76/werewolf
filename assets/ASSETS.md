@@ -7,31 +7,31 @@ Repo 只追蹤 **runtime 用到的檔**；完整 Kenney 包請自行從官網下
 
 ```
 assets/
-  ui/                 # Theme 用 Kenney UI 切片（CC0）
-  sfx/                # 遊戲音效 ogg（自 Kenney Interface Sounds 轉出）
-  characters/shape/   # 2.5D 座位用合成像素人（CC0 Shape Characters）
-  generated/          # 圓桌貼圖、大廳背景、角色 HUD 圖示
+  ui/                      # Theme 用 Kenney UI 切片（CC0）
+  sfx/                     # 遊戲音效 ogg（自 Kenney Interface Sounds 轉出）
+  characters/roguelike/    # 2.5D 座位人物（CC0 Roguelike Characters 切片）
+  generated/               # 圓桌貼圖、大廳背景、角色 HUD 圖示
 ```
 
 | 路徑 | 授權 | 用途 |
 |------|------|------|
 | `assets/ui/` | Kenney UI pack RPG extension · [CC0](https://creativecommons.org/publicdomain/zero/1.0/) | Theme 按鈕／面板（7 張） |
 | `assets/sfx/` | Kenney Interface Sounds · CC0 | click / vote / night / day 等 |
-| `assets/characters/shape/` | Kenney Shape Characters · CC0 | Sprite3D 座位人物（精簡池 12 + me/dead/wolf） |
+| `assets/characters/roguelike/` | Kenney Roguelike Characters · CC0 | Sprite3D 座位人物（池 12 + me/dead/wolf） |
 | `assets/generated/` | 專案生成 | `table.png`、`bg_lobby.png`、`role_*.png` |
 
-授權檔：`assets/ui/LICENSE_KENNEY_UI.txt`  
+授權檔：`assets/ui/LICENSE_KENNEY_UI.txt`、`assets/characters/roguelike/LICENSE_KENNEY_ROGUELIKE.txt`  
 Kenney 原文：可用於個人與商業；署名非必須但建議（Kenney / kenney.nl）。
 
 下載來源：  
-https://kenney.nl/assets · https://opengameart.org/content/ui-pack-rpg-extension
+https://kenney.nl/assets · https://kenney.nl/assets/roguelike-characters · https://opengameart.org/content/ui-pack-rpg-extension
 
 ## 2.5D 架構（與素材對應）
 
 | 部分 | 技術 / 素材 |
 |------|-------------|
 | 場景 | `table_world_3d`：3D mesh + 燈光；桌面貼 `generated/table.png` |
-| 人物 | `seat_token_3d`：`characters/shape/*` → Sprite3D Y-billboard |
+| 人物 | `seat_token_3d`：`characters/roguelike/*` → Sprite3D Y-billboard |
 | HUD 角色圖 | `room.gd` preload `generated/role_*.png` |
 | 大廳背景 | `main.tscn` → `generated/bg_lobby.png` |
 | UI Theme | `themes/werewolf_theme.tres` → `assets/ui/*` |
@@ -43,7 +43,7 @@ https://kenney.nl/assets · https://opengameart.org/content/ui-pack-rpg-extensio
 
 1. 保持檔名與路徑，或同步改 `preload` / Theme  
 2. 像素風在 Godot Import 建議 **Nearest** filter  
-3. 若要擴充座位造型：只加 `characters/shape/`，並更新 `seat_token_3d.gd` 的 `POOL`
+3. 若要擴充座位造型：只加 `characters/roguelike/`（16×16 切片後 nearest 放大），並更新 `seat_token_3d.gd` 的 `POOL`
 
 ## 刻意不進 repo 的東西
 

@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/game/seat_token_3d.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/characters/shape/alive.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/characters/roguelike/player_00.png" id="2"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_ring"]
 top_radius = 0.38
@@ -34,11 +34,11 @@ surface_material_override/0 = SubResource("StandardMaterial3D_ring")
 
 [node name="Sprite3D" type="Sprite3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
-pixel_size = 0.012
+pixel_size = 0.017
 billboard = 2
 shaded = true
 alpha_cut = 1
-texture_filter = 1
+texture_filter = 0
 texture = ExtResource("2")
 
 [node name="NameLabel" type="Label3D" parent="."]
