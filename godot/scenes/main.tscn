@@ -55,7 +55,7 @@ horizontal_alignment = 1
 [node name="Subtitle" type="Label" parent="Center/Panel/Margin/VBox" unique_id=912267724]
 modulate = Color(0.75, 0.75, 0.8, 1)
 layout_mode = 2
-text = "Godot 客戶端 · 連線 Cloudflare 後端"
+text = "2.5D 圓桌 · 連線開局"
 horizontal_alignment = 1
 
 [node name="BaseUrlLabel" type="Label" parent="Center/Panel/Margin/VBox" unique_id=172180481]
@@ -65,7 +65,7 @@ text = "伺服器 URL"
 [node name="BaseUrl" type="LineEdit" parent="Center/Panel/Margin/VBox" unique_id=1786968667]
 unique_name_in_owner = true
 layout_mode = 2
-placeholder_text = "https://werewolf-demo.leafxc0903.workers.dev"
+placeholder_text = "https://werewolf.leafxc0903.workers.dev"
 
 [node name="NameLabel" type="Label" parent="Center/Panel/Margin/VBox" unique_id=838521492]
 layout_mode = 2

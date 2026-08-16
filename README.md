@@ -1,23 +1,25 @@
 # 線上多人狼人殺
 
-Cloudflare Workers 做邊緣路由、**每間房一個 Durable Object** 持有權威遊戲狀態、
-WebSocket（Hibernation API）即時廣播。
+即時多人狼人殺。建房、把連結傳給朋友，6–12 人開局；身分與夜行動由伺服器判定，
+客戶端只鏡像公開狀態。
+
+後端是 Cloudflare Workers（邊緣路由）+ **每間房一個 Durable Object** + WebSocket。
 
 | 路徑 | 角色 |
 |------|------|
 | `src/`、`test/`、`wrangler.jsonc` | 權威後端（規則、座位、勝負） |
-| `public/`、`src/client/` | 網頁客戶端（除錯／沒裝 Godot 時用） |
+| `public/`、`src/client/` | 網頁客戶端 |
 | `godot/` | Godot 4.7 **2.5D 圓桌客戶端** |
 
-GitHub：[leaf76/werewolf](https://github.com/leaf76/werewolf)（由 `werewolf-demo` + `werewolf-godot` 合併）。  
-Worker 部署名稱仍是 `werewolf-demo`，線上 URL 不變。
+GitHub：[leaf76/werewolf](https://github.com/leaf76/werewolf)。  
+線上網址：`https://werewolf.leafxc0903.workers.dev`
 
 ## 線上玩
 
-➡️ **https://werewolf-demo.leafxc0903.workers.dev**
+➡️ **https://werewolf.leafxc0903.workers.dev**
 
 建房 → 複製邀請連結給朋友（6–12 人）。人不夠可以用 bot 補位：
-`node scripts/bots.mjs <房號> 4 wss://werewolf-demo.leafxc0903.workers.dev`
+`node scripts/bots.mjs <房號> 4 wss://werewolf.leafxc0903.workers.dev`
 
 ## 玩法規則
 
@@ -96,29 +98,40 @@ npm run e2e        # 協定層 E2E 煙霧測試（需要 dev server 在跑）
 npm run deploy     # 需要先 wrangler login
 ```
 
+第一次部署前建立房間索引 KV，把回傳的 id 填進 `wrangler.jsonc` 的 `ROOM_INDEX`：
+
+```sh
+npx wrangler kv namespace create ROOM_INDEX
+npx wrangler kv namespace create ROOM_INDEX --preview
+```
+
 ## 安全設計（server 權威）
 
 - 角色**只單獨送給本人**；狼人隊友與刀向只送狼人；查驗結果只送預言家；
   女巫的睜眼資訊只送女巫；廣播的 `room_state` 不含任何身分
-  （「死亡亮牌」開啟時，僅已出局玩家的身分公開）
+  （「死亡亮牌」開啟時，僅已出局玩家的身分公開）。夜間只公開「是否還有行動」，
+  不公開還剩幾件。
 - **座位憑證**：`playerId` 是公開識別（出現在 `room_state`），但重連／回座位必須帶
   server 在入座時 unicast 的 `secret`（存在瀏覽器 `sessionStorage`）。
   只有公開的 `playerId` **不能**冒充他人；錯誤 secret 也不會踢掉合法連線。
   旁觀者使用 server 配發的 id，不能拿別人的 `playerId` 把在座玩家踢下線。
 - 所有動作在 DO 內驗證：階段、身分、存活、目標合法性 —— **deny by default**，
   未授權動作一律回 `error`；旁觀者無法做任何遊戲動作
-- 聊天有長度上限與**頻率限制**（token bucket，5 則 / 每 2 秒回填一則）
-- 房號 6 碼、去混淆字母表、`crypto.getRandomValues` 產生，配 DO 原子 `claim` 防碰撞
+- 聊天有長度上限與**頻率限制**（token bucket 寫在 WebSocket attachment，hibernate 後仍有效）
+- 建房 `POST /api/rooms` 有 Workers Rate Limiting（每 IP 每分鐘 30 間）；未入索引的房號
+  不叫醒 Durable Object。每房最多 20 條 WebSocket。
+- 房號 6 碼、去混淆字母表、`crypto.getRandomValues` 產生，配 DO 原子 `claim` 防碰撞；
+  發牌洗牌同樣走 CSPRNG。
 - 沒有帳號、不收個資、無任何硬編碼 secret
+- 靜態頁與 API 帶 CSP / `X-Content-Type-Options` / `X-Frame-Options`；瀏覽器 WebSocket
+  的 `Origin` 必須是本站或 localhost（Godot／bots 不帶 Origin，仍可連）
 
-## 已知取捨（demo 範圍）
+## 目前規則與產品範圍
 
-- 這是**課程示範**，不是對抗惡意玩家的產品級對戰平台：建房 API 無全局限流、
-  聊天限流是 per-socket（重開連線可重置）、沒有 CAPTCHA／登入。
-  公開部署請自備 Cloudflare rate limit / WAF，或僅在課堂時段開服務。
-- 勝負只算「屠城」（同數即勝），沒有屠邊規則
-- 沒有警長、白痴、邱比特等進階配置；沒有排行榜與資料庫（依 prompt 列為非目標）
-- 女巫首夜可自救、狼人可自刀（配合女巫解藥是合法戰術）；預言家不能驗自己
+- 沒有帳號：房號即邀請；建房有 per-colo 速率限制。
+- 勝負只算「屠城」（同數即勝），沒有屠邊規則。
+- 沒有警長、白痴、邱比特等進階配置；沒有排行榜。
+- 女巫首夜可自救、狼人可自刀（配合女巫解藥是合法戰術）；預言家不能驗自己。
 
 ## License
 

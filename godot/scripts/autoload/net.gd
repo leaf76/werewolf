@@ -1,4 +1,4 @@
-## HTTP room API + WebSocket transport for the werewolf-demo backend.
+## HTTP room API + WebSocket transport for the werewolf backend.
 extends Node
 
 signal connected
@@ -8,8 +8,8 @@ signal http_error(message: String)
 signal room_created(code: String)
 signal room_exists_result(code: String, exists: bool)
 
-## Default: production demo. Override in main UI or set before connect.
-var base_url: String = "https://werewolf-demo.leafxc0903.workers.dev"
+## Default: production server. Override in main UI or set before connect.
+var base_url: String = "https://werewolf.leafxc0903.workers.dev"
 
 ## When true, create/join skip network (UI-only testing).
 var offline_mode: bool = false
@@ -197,7 +197,7 @@ func _offline_connected(code: String) -> void:
 				},
 			],
 			"votedIds": [],
-			"nightPending": 0,
+			"nightPending": false,
 			"nightStage": null,
 			"runoffIds": null,
 			"deadlineAt": null,

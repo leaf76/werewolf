@@ -2,8 +2,8 @@
 $ErrorActionPreference = "Stop"
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-$Base = "https://werewolf-demo.leafxc0903.workers.dev"
-$WsBase = "wss://werewolf-demo.leafxc0903.workers.dev"
+$Base = "https://werewolf.leafxc0903.workers.dev"
+$WsBase = "wss://werewolf.leafxc0903.workers.dev"
 $PlayerCount = 6
 $LogPath = Join-Path $PSScriptRoot "..\e2e_result.txt"
 

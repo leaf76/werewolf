@@ -289,7 +289,7 @@ func _render_status() -> void:
 			else:
 				text = "點選圓桌座位：查驗身分"
 		else:
-			text = "夜深了，等待 %s 個夜間行動…" % str(room.get("nightPending", 0))
+			text = "夜深了，等待夜間行動…" if bool(room.get("nightPending", false)) else "夜深了，等待天亮…"
 	elif ph == "day":
 		var voted: Array = room.get("votedIds", [])
 		var alive := 0

@@ -140,7 +140,7 @@ func _ensure_offline_lobby() -> void:
 			{"id": "bot-3", "name": "小藍", "seat": 3, "alive": true, "connected": true},
 		],
 		"votedIds": [],
-		"nightPending": 0,
+		"nightPending": false,
 		"nightStage": null,
 		"runoffIds": null,
 		"deadlineAt": null,

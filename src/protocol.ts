@@ -32,8 +32,8 @@ export interface PublicRoomState {
   players: PublicPlayer[];
   /** Day only: who has already voted (targets stay secret until the reveal). */
   votedIds: string[];
-  /** Night only: number of pending secret actions (never who). */
-  nightPending: number;
+  /** Night only: whether any secret night action is still outstanding (never who or how many). */
+  nightPending: boolean;
   /** Night only: which script beat the room is on (composition is public). */
   nightStage: NightStage | null;
   /** Day only: candidates of a runoff (PK) revote, if one is in progress. */
@@ -135,3 +135,7 @@ export const MAX_PLAYERS = 12;
 export const MIN_PLAYERS = 6;
 export const MAX_CHAT_LEN = 200;
 export const MAX_NAME_LEN = 12;
+/** Seats plus a small spectator gallery; extra sockets are refused. */
+export const MAX_SOCKETS = 20;
+/** Reject oversized WebSocket text frames before JSON.parse. */
+export const MAX_WS_BYTES = 4096;

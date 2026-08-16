@@ -23,7 +23,7 @@
 
 大廳預設伺服器：
 
-`https://werewolf-demo.leafxc0903.workers.dev`
+`https://werewolf.leafxc0903.workers.dev`
 
 1. 暱稱填 `測試A`（1–12 字）
 2. 按 **建立房間**
@@ -45,7 +45,7 @@ Project → Run Multiple Instances → 2 → F5
 第二個視窗用不同暱稱 + 房號 → **加入房間**
 
 **B. 用瀏覽器**  
-開 `https://werewolf-demo.leafxc0903.workers.dev` 建/入同一房  
+開 `https://werewolf.leafxc0903.workers.dev` 建/入同一房  
 （Godot 的「複製邀請」會複製瀏覽器連結）
 
 兩邊玩家列表都應看到 2 人。
@@ -57,7 +57,7 @@ Project → Run Multiple Instances → 2 → F5
 在 **repo 根目錄**（有 `package.json` / `scripts/bots.mjs`）：
 
 ```sh
-node scripts/bots.mjs <房號> 5 wss://werewolf-demo.leafxc0903.workers.dev
+node scripts/bots.mjs <房號> 5 wss://werewolf.leafxc0903.workers.dev
 ```
 
 房主（建立房間的人）勾選可選「死亡亮牌」→ **開始遊戲**  

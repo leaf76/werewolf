@@ -4,18 +4,19 @@ Repo-specific guidance for coding agents. Global always-on rules (security, Engl
 
 ## Purpose and scope
 
-Monorepo for online werewolf:
+Monorepo for the online werewolf game:
 
 - **Authority** (rules, seats, night/day, win): Cloudflare Workers + Room Durable Object in this repo (`src/`).
 - **Web client**: `src/client/` + `public/` (no framework).
 - **Godot 4.7 2.5D client**: `godot/` — HTTP create/join + WSS intents only.
 - Do **not** reimplement server authority in Godot unless the user explicitly scopes a backend rewrite.
 
-Production Worker URL (name stays `werewolf-demo` in `wrangler.jsonc`):
+Production Worker URL (`name` in `wrangler.jsonc` is `werewolf`):
 
-`https://werewolf-demo.leafxc0903.workers.dev`
+`https://werewolf.leafxc0903.workers.dev`
 
-GitHub: `leaf76/werewolf`. Former repos: `werewolf-demo` (this tree) and `werewolf-godot` (now `godot/`).
+GitHub: `leaf76/werewolf`.  
+Former Worker name / hostname: `werewolf-demo`. Former repos: `werewolf-demo` (this tree) and `werewolf-godot` (now `godot/`).
 
 ## Repo snapshot
 
@@ -41,7 +42,7 @@ GitHub: `leaf76/werewolf`. Former repos: `werewolf-demo` (this tree) and `werewo
 - **Do not commit**: `node_modules/`, `.wrangler/`, `.godot/`, `export_presets.cfg`, `*.zip`, `godot/assets/kenney/`, debug artifacts — see `.gitignore`.
 - **Do not** weaken client/server trust: secret roles and private night info only via unicast (`role_assigned`, `seer_result`, `witch_wake`, `wolf_pick`, …).
 - Seat credentials: web `sessionStorage`; Godot `user://seat_<CODE>.cfg` — do not log secrets.
-- Do not rename the Wrangler worker (`werewolf-demo`) unless the user wants to change the live hostname.
+- Do not rename the Wrangler worker (`werewolf`) unless the user wants to change the live hostname.
 
 ## Verified commands
 
@@ -60,7 +61,8 @@ godot --path godot -s res://tools/auto_test_create.gd
 
 - Clients send intents only: `join`, `start_game`, `night_action`, `vote`, `hunt`, `restart`, `chat`.
 - Server is source of truth. Godot `GameState` is a **mirror**.
-- Align limits in `src/protocol.ts` and `godot/scripts/autoload/protocol.gd`.
+- Align limits in `src/protocol.ts` and `godot/scripts/autoload/protocol.gd`
+  (`MAX_PLAYERS`, `MAX_CHAT_LEN`, `MAX_SOCKETS`, `MAX_WS_BYTES`).
 - Close codes: `4000` replaced, `4001` join denied.
 
 ## Validation

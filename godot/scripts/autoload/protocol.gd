@@ -6,6 +6,8 @@ const MIN_PLAYERS := 6
 const MAX_PLAYERS := 12
 const MAX_CHAT_LEN := 200
 const MAX_NAME_LEN := 12
+const MAX_SOCKETS := 20
+const MAX_WS_BYTES := 4096
 
 const ROLE_NAMES := {
 	"werewolf": "狼人",

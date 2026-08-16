@@ -30,7 +30,7 @@ Godot 4 (this folder)  --HTTP-->  POST /api/rooms, GET /api/rooms/:code
 ## 需求
 
 - Godot **4.7**（`project.godot` features；4.2+ 理論可開，以 4.7 為準）
-- 可連到後端（預設正式 demo，或 repo 根目錄 `npm run dev`）
+- 可連到後端（預設正式伺服器，或 repo 根目錄 `npm run dev`）
 
 ## 開啟專案
 

@@ -67,8 +67,7 @@ const SECRET_KEY = `ww-secret:${code}`;
 const NAME_KEY = `ww-name:${code}`;
 
 // sessionStorage (not localStorage) on purpose: a refresh keeps the seat,
-// while separate tabs in the same browser can play as different players —
-// which is exactly how the two-tab demo works.
+// while separate tabs in the same browser can play as different players.
 // playerId is public (appears in room_state); secret is the server-issued
 // token required to rebind this seat — never share it, never put it in URLs.
 function myPlayerId(): string {
@@ -503,7 +502,7 @@ function renderStatus(): void {
         ? `你查驗了 ${nameOf(picked.targetId)}，等待天亮…`
         : "選擇要查驗身分的玩家。";
     } else {
-      text = `夜深了，等待 ${state.nightPending} 個夜間行動…`;
+      text = state.nightPending ? "夜深了，等待夜間行動…" : "夜深了，等待天亮…";
     }
   } else if (state.phase === "day") {
     const votedCount = state.votedIds.length;

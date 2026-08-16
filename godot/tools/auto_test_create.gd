@@ -44,7 +44,7 @@ func _initialize() -> void:
 
 	# --- online create ---
 	net.offline_mode = false
-	net.set_base_url("https://werewolf-demo.leafxc0903.workers.dev")
+	net.set_base_url("https://werewolf.leafxc0903.workers.dev")
 	got_code[0] = ""
 	err_msg[0] = ""
 	net.room_created.connect(func(c: String): got_code[0] = c, CONNECT_ONE_SHOT)

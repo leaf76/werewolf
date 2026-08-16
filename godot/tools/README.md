@@ -4,7 +4,7 @@ Helper scripts (not required to play).
 
 | File | Purpose |
 |------|---------|
-| `auto_test_create.gd` | Headless: create room against live/demo API |
+| `auto_test_create.gd` | Headless: create room against the live API |
 | `e2e_test.ps1` | Windows-oriented e2e helper |
 | `click_create.ps1` | Windows UI automation helper |
 

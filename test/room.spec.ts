@@ -494,3 +494,61 @@ describe("phase timers", () => {
     expect(await stub.exists()).toBe(false);
   });
 });
+
+describe("public hardening", () => {
+  it("does not advertise how many night actions remain", async () => {
+    const { clients } = await sixPlayerRoom();
+    await startAndDiscoverRoles(clients);
+    const state = await clients[0]!.until("room_state");
+    expect(state.state.nightPending).toBe(true);
+  });
+
+  it("answers existence from the index without requiring a live socket", async () => {
+    const missing = await SELF.fetch("https://example.com/api/rooms/ZZZZZZ");
+    expect(missing.status).toBe(200);
+    expect(await missing.json()).toEqual({ exists: false });
+
+    const code = await createRoom();
+    const found = await SELF.fetch(`https://example.com/api/rooms/${code}`);
+    expect(await found.json()).toEqual({ exists: true });
+  });
+
+  it("rejects websocket upgrades to unindexed rooms and foreign origins", async () => {
+    const ghost = await SELF.fetch("https://example.com/api/rooms/ZZZZZZ/ws", {
+      headers: { Upgrade: "websocket" },
+    });
+    expect(ghost.status).toBe(404);
+
+    const code = await createRoom();
+    const evil = await SELF.fetch(`https://example.com/api/rooms/${code}/ws`, {
+      headers: { Upgrade: "websocket", Origin: "https://evil.example" },
+    });
+    expect(evil.status).toBe(403);
+  });
+
+  it("puts security headers on HTML and JSON", async () => {
+    const res = await SELF.fetch("https://example.com/");
+    expect(res.headers.get("content-security-policy")).toMatch(/script-src 'self'/);
+    expect(res.headers.get("x-frame-options")).toBe("DENY");
+  });
+
+  it("rejects oversized websocket frames", async () => {
+    const code = await createRoom();
+    const client = await connect(code, "big-frame");
+    client.send({ type: "chat", text: "x".repeat(5000) } as ClientMessage);
+    expect((await client.until("error")).code).toBe("bad_message");
+  });
+
+  it("refuses a 21st websocket on a room", async () => {
+    const code = await createRoom();
+    const held: Client[] = [];
+    for (let i = 0; i < 20; i++) {
+      held.push(await connect(code, `cap-${i}`));
+    }
+    const extra = await SELF.fetch(`https://example.com/api/rooms/${code}/ws`, {
+      headers: { Upgrade: "websocket" },
+    });
+    expect(extra.status).toBe(503);
+    for (const c of held) c.close();
+  });
+});

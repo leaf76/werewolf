@@ -17,6 +17,8 @@ import * as g from "./game";
 import {
   MAX_CHAT_LEN,
   MAX_NAME_LEN,
+  MAX_SOCKETS,
+  MAX_WS_BYTES,
   type ClientMessage,
   type PublicRoomState,
   type RoleReveal,
@@ -26,6 +28,9 @@ import {
 interface Attachment {
   playerId: string;
   spectator?: boolean;
+  /** Survives hibernation (WeakMap buckets do not). */
+  chatTokens?: number;
+  chatLast?: number;
 }
 
 export interface TimerConfig {
@@ -69,8 +74,6 @@ export class RoomDO extends DurableObject<Env> {
    * wiped with the room on teardown.
    */
   private secrets: Record<string, string> = {};
-  /** In-memory flood buckets; reset by hibernation, which is fine. */
-  private chatBuckets = new WeakMap<WebSocket, { tokens: number; last: number }>();
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
@@ -92,6 +95,7 @@ export class RoomDO extends DurableObject<Env> {
     this.game = g.newGame(code);
     this.timers = { ...DEFAULT_TIMERS, ...opts?.timers };
     await this.ctx.storage.put("timer-config", this.timers);
+    await this.env.ROOM_INDEX.put(code.toUpperCase(), "1");
     await this.persist();
     await this.afterTransition();
     return true;
@@ -110,6 +114,10 @@ export class RoomDO extends DurableObject<Env> {
     if (!this.game) {
       return new Response("room not found", { status: 404 });
     }
+    const open = this.ctx.getWebSockets().filter((s) => s.readyState === WebSocket.READY_STATE_OPEN).length;
+    if (open >= MAX_SOCKETS) {
+      return new Response("too many connections", { status: 503 });
+    }
     const pair = new WebSocketPair();
     const client = pair[0];
     const server = pair[1];
@@ -127,6 +135,10 @@ export class RoomDO extends DurableObject<Env> {
     let msg: ClientMessage;
     try {
       if (typeof raw !== "string") throw new Error("binary frame");
+      if (raw.length > MAX_WS_BYTES) {
+        this.sendError(ws, "bad_message", "message too large");
+        return;
+      }
       const parsed: unknown = JSON.parse(raw);
       if (typeof parsed !== "object" || parsed === null || typeof (parsed as { type?: unknown }).type !== "string") {
         throw new Error("bad shape");
@@ -219,7 +231,10 @@ export class RoomDO extends DurableObject<Env> {
         // already closed
       }
     }
+    const code = this.game?.code;
     this.game = null;
+    this.secrets = {};
+    if (code) await this.env.ROOM_INDEX.delete(code.toUpperCase());
     await this.ctx.storage.deleteAll(); // also clears the alarm
   }
 
@@ -243,7 +258,7 @@ export class RoomDO extends DurableObject<Env> {
     // the legitimate connection (no replaceSockets on failure).
     const existing = game.players.find((p) => p.id === playerId);
     if (existing) {
-      if (!secret || this.secrets[playerId] !== secret) {
+      if (!secret || !secretsEqual(this.secrets[playerId], secret)) {
         this.sendError(ws, "bad_session", "invalid or missing seat secret");
         return;
       }
@@ -293,7 +308,7 @@ export class RoomDO extends DurableObject<Env> {
     const player = this.requireJoined(ws);
     if (!player) return;
 
-    const res = g.startGame(game, player.id, Math.random, {
+    const res = g.startGame(game, player.id, cryptoUnitRandom, {
       revealOnDeath: msg.revealOnDeath === true,
     });
     if (!res.ok) {
@@ -597,15 +612,17 @@ export class RoomDO extends DurableObject<Env> {
 
   private allowChat(ws: WebSocket): boolean {
     const now = Date.now();
-    const bucket = this.chatBuckets.get(ws) ?? { tokens: CHAT_BURST, last: now };
-    bucket.tokens = Math.min(CHAT_BURST, bucket.tokens + (now - bucket.last) / CHAT_REFILL_MS);
-    bucket.last = now;
-    if (bucket.tokens < 1) {
-      this.chatBuckets.set(ws, bucket);
+    const att = this.attachment(ws);
+    if (!att) return false;
+    let tokens = att.chatTokens ?? CHAT_BURST;
+    const last = att.chatLast ?? now;
+    tokens = Math.min(CHAT_BURST, tokens + (now - last) / CHAT_REFILL_MS);
+    if (tokens < 1) {
+      ws.serializeAttachment({ ...att, chatTokens: tokens, chatLast: now } satisfies Attachment);
       return false;
     }
-    bucket.tokens -= 1;
-    this.chatBuckets.set(ws, bucket);
+    tokens -= 1;
+    ws.serializeAttachment({ ...att, chatTokens: tokens, chatLast: now } satisfies Attachment);
     return true;
   }
 
@@ -727,15 +744,21 @@ export class RoomDO extends DurableObject<Env> {
       else connected.add(att.playerId);
     }
 
-    let nightPending = 0;
+    let nightPending = false;
     if (game.phase === "night") {
       if (game.nightStage === "witch") {
-        nightPending = 1;
+        nightPending = true;
       } else {
         for (const p of game.players) {
           if (!p.alive) continue;
-          if (p.role === "werewolf" && !game.killVotes[p.id]) nightPending++;
-          if (p.role === "seer" && !game.inspectTarget) nightPending++;
+          if (p.role === "werewolf" && !game.killVotes[p.id]) {
+            nightPending = true;
+            break;
+          }
+          if (p.role === "seer" && !game.inspectTarget) {
+            nightPending = true;
+            break;
+          }
         }
       }
     }
@@ -792,4 +815,19 @@ export class RoomDO extends DurableObject<Env> {
       }
     }
   }
+}
+
+function cryptoUnitRandom(): number {
+  const buf = new Uint32Array(1);
+  crypto.getRandomValues(buf);
+  return buf[0]! / 4294967296;
+}
+
+function secretsEqual(stored: string | undefined, offered: string): boolean {
+  if (!stored) return false;
+  const enc = new TextEncoder();
+  const a = enc.encode(stored);
+  const b = enc.encode(offered);
+  if (a.byteLength !== b.byteLength) return false;
+  return crypto.subtle.timingSafeEqual(a, b);
 }
