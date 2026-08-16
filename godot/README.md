@@ -1,8 +1,8 @@
 # 狼人殺 · Godot 4 Client（2.5D）
 
-對接 [leaf76/werewolf-demo](https://github.com/leaf76/werewolf-demo) 的 **既有 WebSocket 協定**。  
-**規則 / 房間 / 身分保密仍由 Cloudflare Workers + Durable Object 權威處理**；  
-Godot 做 **2.5D 圓桌客戶端**（3D 桌面 + 廣告牌像素人、日夜燈光、HUD + 送意圖）。
+本目錄是 monorepo [leaf76/werewolf](https://github.com/leaf76/werewolf) 的 **Godot 客戶端**。  
+**規則 / 房間 / 身分保密**由 repo 根目錄的 Cloudflare Workers + Durable Object 處理；  
+此處只做 2.5D 圓桌（3D 桌面 + 廣告牌像素人、日夜燈光、HUD + 送意圖）。
 
 開源素材說明見 [`assets/ASSETS.md`](assets/ASSETS.md)。  
 本機逐步操作見 [`STEPS.md`](STEPS.md)。
@@ -10,10 +10,10 @@ Godot 做 **2.5D 圓桌客戶端**（3D 桌面 + 廣告牌像素人、日夜燈�
 ## 架構
 
 ```
-Godot 4 (本專案)  --HTTP-->  POST /api/rooms, GET /api/rooms/:code
-                  --WSS--->  /api/rooms/:code/ws  (JSON 與 protocol.ts 相同)
-                              ↓
-                     Cloudflare Room DO（權威狀態）
+Godot 4 (this folder)  --HTTP-->  POST /api/rooms, GET /api/rooms/:code
+                       --WSS--->  /api/rooms/:code/ws  (JSON 與 src/protocol.ts 相同)
+                                   ↓
+                          Cloudflare Room DO（權威狀態）
 ```
 
 | 模組 | 職責 |
@@ -30,30 +30,19 @@ Godot 4 (本專案)  --HTTP-->  POST /api/rooms, GET /api/rooms/:code
 ## 需求
 
 - Godot **4.7**（`project.godot` features；4.2+ 理論可開，以 4.7 為準）
-- 可連到後端（預設正式 demo，或本機 `wrangler dev`）
+- 可連到後端（預設正式 demo，或 repo 根目錄 `npm run dev`）
 
 ## 開啟專案
 
 1. 安裝 [Godot 4.7](https://godotengine.org/download)
-2. Project → Import → 選本目錄的 `project.godot`
+2. Project → Import → 選 **這個 `godot/` 資料夾** 的 `project.godot`
 3. 按 F5 執行
 
-本機路徑範例：
+## 本機對接後端
 
-```text
-/Users/cy76/WorkSpace/sideProject/game_projects/werewolf-godot
-```
-
-後端同機路徑：
-
-```text
-/Users/cy76/WorkSpace/sideProject/learn_projects/werewolf-demo
-```
-
-## 本機對接 werewolf-demo 後端
+在 **repo 根目錄**（不是 `godot/`）：
 
 ```sh
-# 在 werewolf-demo repo
 npm install
 npm run dev          # 預設 http://localhost:8787
 ```
@@ -65,16 +54,16 @@ http://localhost:8787
 ```
 
 然後「建立房間」或輸入房號加入。  
-可用瀏覽器 / bot 當其他玩家：
+可用瀏覽器 / bot 當其他玩家（仍在 repo 根目錄）：
 
 ```sh
 node scripts/bots.mjs <房號> 5 ws://localhost:8787
 ```
 
-## 與原 TS client 的對應
+## 與網頁 client 的對應
 
-| 原 client.ts | Godot |
-|--------------|--------|
+| `src/client/client.ts` | Godot |
+|------------------------|--------|
 | `sessionStorage` playerId/secret | `user://seat_<CODE>.cfg` |
 | `WebSocket` | `Net` + `WebSocketPeer` |
 | `handle(msg)` | `GameState.handle_server_message` |
@@ -90,22 +79,21 @@ Client → Server 訊息（勿改欄位名，後端吃 camelCase）：
 - `hunt` `{ targetId: string|null }`
 - `restart` / `chat`
 
-## 建議開發順序
-
-1. **現在**：桌面執行連正式 / 本機後端，打通完整一局  
-2. **UI**：座位動畫、夜/晝、角色立繪  
-3. **多平台**：Windows / Android；Web 匯出需注意 CORS 與包體  
-4. **（可選）後端 Godot 化**：只有當你不要 Cloudflare 時才做；工作量 ≈ 重寫 DO
-
 ## 刻意不做的事
 
-- 不在 client 發牌、算票、判勝負  
+- 不在 client 發牌、算票、判勝負
 - 不信任本地「我是狼所以…」——只顯示 unicast（`role_assigned` / `seer_result` / `witch_wake` / `wolf_pick`）
 
 ## 工具腳本
 
-見 [`tools/`](tools/)（headless create smoke、Windows e2e 輔助）。
+見 [`tools/`](tools/)（headless create smoke、Windows e2e 輔助）。從 **此資料夾** 執行：
+
+```sh
+godot --path . -s res://tools/auto_test_create.gd
+```
+
+或從 repo 根目錄：`godot --path godot -s res://tools/auto_test_create.gd`
 
 ## License
 
-與 demo 相同可自訂；骨架供你繼續開發。Kenney CC0 素材見 `assets/ASSETS.md`。
+與根目錄相同（MIT）。Kenney CC0 素材見 `assets/ASSETS.md`。

@@ -1,8 +1,16 @@
-# 線上多人狼人殺（Claude Code 課程 Demo）
+# 線上多人狼人殺
 
-用一段 prompt 讓 Claude Code 從零建出的即時多人狼人殺：
 Cloudflare Workers 做邊緣路由、**每間房一個 Durable Object** 持有權威遊戲狀態、
-WebSocket（Hibernation API）即時廣播，前端是原生 HTML/CSS/TypeScript（無框架）。
+WebSocket（Hibernation API）即時廣播。
+
+| 路徑 | 角色 |
+|------|------|
+| `src/`、`test/`、`wrangler.jsonc` | 權威後端（規則、座位、勝負） |
+| `public/`、`src/client/` | 網頁客戶端（除錯／沒裝 Godot 時用） |
+| `godot/` | Godot 4.7 **2.5D 圓桌客戶端** |
+
+GitHub：[leaf76/werewolf](https://github.com/leaf76/werewolf)（由 `werewolf-demo` + `werewolf-godot` 合併）。  
+Worker 部署名稱仍是 `werewolf-demo`，線上 URL 不變。
 
 ## 線上玩
 
@@ -27,7 +35,21 @@ WebSocket（Hibernation API）即時廣播，前端是原生 HTML/CSS/TypeScript
 - 開局後加入的人自動成為**旁觀者**（只看得到公開狀態）；終局後房主可「**同房再來一局**」
 - 房間閒置 24 小時（終局後 2 小時）自動回收
 
-## 本機執行
+## Godot 客戶端
+
+1. 安裝 [Godot 4.7](https://godotengine.org/download)
+2. Project → Import → 選 **`godot/`** 裡的 `project.godot`（不要開 repo 根目錄）
+3. 按 F5。大廳可連正式後端或本機 `http://localhost:8787`
+
+逐步操作見 [`godot/STEPS.md`](godot/STEPS.md)，素材說明見 [`godot/assets/ASSETS.md`](godot/assets/ASSETS.md)。
+
+Headless 煙霧（需本機有 Godot CLI）：
+
+```sh
+godot --path godot -s res://tools/auto_test_create.gd
+```
+
+## 本機執行（後端 + 網頁）
 
 ```sh
 npm install

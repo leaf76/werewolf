@@ -3,3 +3,17 @@ node_modules/
 public/client.js
 worker-configuration.d.ts
 .DS_Store
+
+# Godot client (godot/)
+.godot/
+*.translation
+export_presets.cfg
+.mono/
+godot/data_*/
+debug_*.png
+debug_*.png.import
+e2e_result.txt
+mcp_test.*
+*.log
+*.zip
+godot/assets/kenney/

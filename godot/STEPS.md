@@ -5,10 +5,10 @@
 ## 第 0 步：用 Godot 打開專案（現在）
 
 1. 開啟 **Godot 4.7**
-2. **Import** → 選資料夾  
+2. **Import** → 選 **本目錄**（含這份 `STEPS.md` 與 `project.godot`；不要開 repo 根目錄）  
 
 ```text
-/Users/cy76/WorkSpace/sideProject/game_projects/werewolf-godot
+<repo>/godot
 ```
 
 3. 選中 `project.godot` → Import & Edit
@@ -54,10 +54,9 @@ Project → Run Multiple Instances → 2 → F5
 
 ## 第 3 步：Bot 補人開局
 
-在本機有 `werewolf-demo` 時：
+在 **repo 根目錄**（有 `package.json` / `scripts/bots.mjs`）：
 
 ```sh
-cd /Users/cy76/WorkSpace/sideProject/learn_projects/werewolf-demo
 node scripts/bots.mjs <房號> 5 wss://werewolf-demo.leafxc0903.workers.dev
 ```
 
@@ -91,7 +90,7 @@ node scripts/bots.mjs <房號> 5 wss://werewolf-demo.leafxc0903.workers.dev
 ## 本機後端（可選）
 
 ```sh
-cd /Users/cy76/WorkSpace/sideProject/learn_projects/werewolf-demo
+# repo root
 npm run dev
 ```
 
