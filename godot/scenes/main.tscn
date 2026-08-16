@@ -1,0 +1,112 @@
+[gd_scene format=3 uid="uid://cbwhijicmbb2t"]
+
+[ext_resource type="Script" uid="uid://bge52idltjtt4" path="res://scripts/main.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/generated/bg_lobby.png" id="2"]
+
+[node name="Main" type="Control" unique_id=695207604]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="ColorRect" type="TextureRect" parent="." unique_id=1749515424]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Center" type="CenterContainer" parent="." unique_id=30218058]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Center" unique_id=1199276356]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=1872127356]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="Center/Panel/Margin" unique_id=1115853879]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Center/Panel/Margin/VBox" unique_id=1327820499]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "🐺 狼人殺"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Center/Panel/Margin/VBox" unique_id=912267724]
+modulate = Color(0.75, 0.75, 0.8, 1)
+layout_mode = 2
+text = "Godot 客戶端 · 連線 Cloudflare 後端"
+horizontal_alignment = 1
+
+[node name="BaseUrlLabel" type="Label" parent="Center/Panel/Margin/VBox" unique_id=172180481]
+layout_mode = 2
+text = "伺服器 URL"
+
+[node name="BaseUrl" type="LineEdit" parent="Center/Panel/Margin/VBox" unique_id=1786968667]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "https://werewolf-demo.leafxc0903.workers.dev"
+
+[node name="NameLabel" type="Label" parent="Center/Panel/Margin/VBox" unique_id=838521492]
+layout_mode = 2
+text = "暱稱（1–12 字）"
+
+[node name="PlayerName" type="LineEdit" parent="Center/Panel/Margin/VBox" unique_id=2065369619]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "必填：例如 測試A"
+max_length = 12
+
+[node name="OfflineCheck" type="CheckBox" parent="Center/Panel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "離線試玩（不連伺服器，可測圓桌/聊天）"
+
+[node name="CreateBtn" type="Button" parent="Center/Panel/Margin/VBox" unique_id=1377857882]
+unique_name_in_owner = true
+layout_mode = 2
+text = "建立房間"
+
+[node name="Sep" type="HSeparator" parent="Center/Panel/Margin/VBox" unique_id=1991056465]
+layout_mode = 2
+
+[node name="CodeLabel" type="Label" parent="Center/Panel/Margin/VBox" unique_id=255969279]
+layout_mode = 2
+text = "或輸入房號加入"
+
+[node name="RoomCode" type="LineEdit" parent="Center/Panel/Margin/VBox" unique_id=1834974007]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "6 碼房號"
+max_length = 6
+
+[node name="JoinBtn" type="Button" parent="Center/Panel/Margin/VBox" unique_id=866099721]
+unique_name_in_owner = true
+layout_mode = 2
+text = "加入房間"
+
+[node name="Status" type="Label" parent="Center/Panel/Margin/VBox" unique_id=1343202488]
+unique_name_in_owner = true
+modulate = Color(1, 0.85, 0.5, 1)
+layout_mode = 2
+autowrap_mode = 3

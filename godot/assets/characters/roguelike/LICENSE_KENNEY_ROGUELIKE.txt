@@ -1,0 +1,6 @@
+Kenney Roguelike Characters (CC0)
+https://kenney.nl/assets/roguelike-characters
+https://creativecommons.org/publicdomain/zero/1.0/
+
+Runtime slices only (16x16 tiles, 8x nearest upscale).
+Full pack is not committed — re-download from Kenney if needed.

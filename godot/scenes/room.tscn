@@ -1,0 +1,387 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/room.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/game/table_world_3d.tscn" id="2"]
+
+[node name="Room" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="WorldView" type="SubViewportContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="WorldView"]
+unique_name_in_owner = true
+own_world_3d = true
+handle_input_locally = false
+size = Vector2i(1280, 720)
+render_target_update_mode = 4
+physics_object_picking = true
+physics_object_picking_sort = true
+
+[node name="TableWorld3D" parent="WorldView/SubViewport" instance=ExtResource("2")]
+unique_name_in_owner = true
+
+[node name="UI" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="UI"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="TopBar" type="HBoxContainer" parent="UI/VBox"]
+layout_mode = 2
+
+[node name="RoomCodeLabel" type="Label" parent="UI/VBox/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.85)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "房號"
+
+[node name="SpecBadge" type="Label" parent="UI/VBox/TopBar"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 3
+text = "旁觀"
+modulate = Color(0.7, 0.85, 1, 1)
+
+[node name="Conn" type="Label" parent="UI/VBox/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 3
+text = "連線中…"
+
+[node name="CopyBtn" type="Button" parent="UI/VBox/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "複製邀請"
+
+[node name="LeaveBtn" type="Button" parent="UI/VBox/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "離開"
+
+[node name="PhaseRow" type="HBoxContainer" parent="UI/VBox"]
+layout_mode = 2
+
+[node name="Phase" type="Label" parent="UI/VBox/PhaseRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.9)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 24
+text = "—"
+
+[node name="Countdown" type="Label" parent="UI/VBox/PhaseRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.9)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
+text = ""
+
+[node name="StatusLine" type="Label" parent="UI/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.85)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 15
+text = ""
+autowrap_mode = 3
+
+[node name="RoleCard" type="PanelContainer" parent="UI/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="RoleMargin" type="MarginContainer" parent="UI/VBox/RoleCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="RoleH" type="HBoxContainer" parent="UI/VBox/RoleCard/RoleMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="RoleIcon" type="TextureRect" parent="UI/VBox/RoleCard/RoleMargin/RoleH"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RoleV" type="VBoxContainer" parent="UI/VBox/RoleCard/RoleMargin/RoleH"]
+layout_mode = 2
+
+[node name="RoleName" type="Label" parent="UI/VBox/RoleCard/RoleMargin/RoleH/RoleV"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "身分"
+
+[node name="RoleExtra" type="Label" parent="UI/VBox/RoleCard/RoleMargin/RoleH/RoleV"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+modulate = Color(0.85, 0.85, 0.9, 1)
+
+[node name="LobbyActions" type="HBoxContainer" parent="UI/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="RevealCheck" type="CheckBox" parent="UI/VBox/LobbyActions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "死亡亮牌"
+
+[node name="StartBtn" type="Button" parent="UI/VBox/LobbyActions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "開始遊戲"
+
+[node name="WitchPanel" type="HBoxContainer" parent="UI/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="WitchText" type="Label" parent="UI/VBox/WitchPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.85)
+theme_override_constants/outline_size = 3
+text = "女巫"
+
+[node name="WitchSave" type="Button" parent="UI/VBox/WitchPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "救"
+
+[node name="WitchPoison" type="Button" parent="UI/VBox/WitchPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "毒"
+
+[node name="WitchSkip" type="Button" parent="UI/VBox/WitchPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "跳過"
+
+[node name="HuntActions" type="HBoxContainer" parent="UI/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="HuntHint" type="Label" parent="UI/VBox/HuntActions"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.85)
+theme_override_constants/outline_size = 3
+text = "點選玩家開槍，或收槍"
+
+[node name="HuntPass" type="Button" parent="UI/VBox/HuntActions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "收槍"
+
+[node name="Spacer" type="Control" parent="UI/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Bottom" type="HBoxContainer" parent="UI/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LogPanel" type="PanelContainer" parent="UI/VBox/Bottom"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 150)
+
+[node name="LogV" type="VBoxContainer" parent="UI/VBox/Bottom/LogPanel"]
+layout_mode = 2
+
+[node name="LogTitle" type="Label" parent="UI/VBox/Bottom/LogPanel/LogV"]
+layout_mode = 2
+text = "戰況"
+
+[node name="LogList" type="RichTextLabel" parent="UI/VBox/Bottom/LogPanel/LogV"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+scroll_following = true
+
+[node name="ChatPanel" type="PanelContainer" parent="UI/VBox/Bottom"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 150)
+
+[node name="ChatV" type="VBoxContainer" parent="UI/VBox/Bottom/ChatPanel"]
+layout_mode = 2
+
+[node name="ChatTitle" type="Label" parent="UI/VBox/Bottom/ChatPanel/ChatV"]
+layout_mode = 2
+text = "💬 聊天室（圓桌上方也會出泡泡）"
+
+[node name="ChatList" type="RichTextLabel" parent="UI/VBox/Bottom/ChatPanel/ChatV"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 70)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+scroll_following = true
+
+[node name="ChatRow" type="HBoxContainer" parent="UI/VBox/Bottom/ChatPanel/ChatV"]
+layout_mode = 2
+
+[node name="ChatInput" type="LineEdit" parent="UI/VBox/Bottom/ChatPanel/ChatV/ChatRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "說點什麼…"
+
+[node name="ChatSend" type="Button" parent="UI/VBox/Bottom/ChatPanel/ChatV/ChatRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "送出"
+
+[node name="Toast" type="Label" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -220.0
+offset_top = -96.0
+offset_right = 220.0
+offset_bottom = -56.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.9)
+theme_override_constants/outline_size = 4
+horizontal_alignment = 1
+modulate = Color(1, 0.92, 0.55, 1)
+
+[node name="GameOver" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -210.0
+offset_top = -170.0
+offset_right = 210.0
+offset_bottom = 170.0
+
+[node name="GOMargin" type="MarginContainer" parent="GameOver"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="GOV" type="VBoxContainer" parent="GameOver/GOMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="GOTitle" type="Label" parent="GameOver/GOMargin/GOV"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "遊戲結束"
+horizontal_alignment = 1
+
+[node name="WinnerLine" type="Label" parent="GameOver/GOMargin/GOV"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="RevealList" type="RichTextLabel" parent="GameOver/GOMargin/GOV"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+
+[node name="RestartBtn" type="Button" parent="GameOver/GOMargin/GOV"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "同房再來一局"
+
+[node name="FatalPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -230.0
+offset_top = -90.0
+offset_right = 230.0
+offset_bottom = 90.0
+
+[node name="FMargin" type="MarginContainer" parent="FatalPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
+
+[node name="FV" type="VBoxContainer" parent="FatalPanel/FMargin"]
+layout_mode = 2
+
+[node name="FatalTitle" type="Label" parent="FatalPanel/FMargin/FV"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "錯誤"
+horizontal_alignment = 1
+
+[node name="FatalText" type="Label" parent="FatalPanel/FMargin/FV"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+horizontal_alignment = 1

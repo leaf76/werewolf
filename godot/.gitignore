@@ -1,0 +1,25 @@
+# Godot 4 — never commit the local editor cache
+.godot/
+*.translation
+export_presets.cfg
+.mono/
+data_*/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/
+
+# Local debug / scratch (not product)
+debug_*.png
+debug_*.png.import
+e2e_result.txt
+mcp_test.*
+*.log
+
+# Source archives (do not commit full Kenney packs)
+*.zip
+assets/kenney/

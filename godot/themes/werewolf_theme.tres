@@ -1,0 +1,116 @@
+[gd_resource type="Theme" load_steps=10 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/ui/buttonLong_brown.png" id="1_btn"]
+[ext_resource type="Texture2D" path="res://assets/ui/buttonLong_brown_pressed.png" id="2_btn_p"]
+[ext_resource type="Texture2D" path="res://assets/ui/buttonLong_beige.png" id="3_btn_h"]
+[ext_resource type="Texture2D" path="res://assets/ui/panel_beige.png" id="4_panel"]
+[ext_resource type="Texture2D" path="res://assets/ui/panelInset_beigeLight.png" id="5_inset"]
+[ext_resource type="Texture2D" path="res://assets/ui/buttonLong_blue.png" id="6_blue"]
+[ext_resource type="Texture2D" path="res://assets/ui/buttonLong_blue_pressed.png" id="7_blue_p"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_normal"]
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 10.0
+texture = ExtResource("1_btn")
+texture_margin_left = 12.0
+texture_margin_top = 10.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_pressed"]
+content_margin_left = 14.0
+content_margin_top = 10.0
+content_margin_right = 14.0
+content_margin_bottom = 8.0
+texture = ExtResource("2_btn_p")
+texture_margin_left = 12.0
+texture_margin_top = 10.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_hover"]
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 10.0
+texture = ExtResource("3_btn_h")
+texture_margin_left = 12.0
+texture_margin_top = 10.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn_disabled"]
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 10.0
+texture = ExtResource("1_btn")
+texture_margin_left = 12.0
+texture_margin_top = 10.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+modulate_color = Color(0.6, 0.6, 0.6, 0.75)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_panel"]
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+texture = ExtResource("4_panel")
+texture_margin_left = 16.0
+texture_margin_top = 16.0
+texture_margin_right = 16.0
+texture_margin_bottom = 16.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_line_edit"]
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+texture = ExtResource("5_inset")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_primary"]
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 10.0
+texture = ExtResource("6_blue")
+texture_margin_left = 12.0
+texture_margin_top = 10.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_primary_p"]
+content_margin_left = 14.0
+content_margin_top = 10.0
+content_margin_right = 14.0
+content_margin_bottom = 8.0
+texture = ExtResource("7_blue_p")
+texture_margin_left = 12.0
+texture_margin_top = 10.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
+[resource]
+default_font_size = 15
+Button/colors/font_color = Color(0.2, 0.12, 0.06, 1)
+Button/colors/font_disabled_color = Color(0.35, 0.3, 0.28, 0.7)
+Button/colors/font_hover_color = Color(0.15, 0.1, 0.05, 1)
+Button/colors/font_pressed_color = Color(0.12, 0.08, 0.04, 1)
+Button/font_sizes/font_size = 15
+Button/styles/disabled = SubResource("StyleBoxTexture_btn_disabled")
+Button/styles/hover = SubResource("StyleBoxTexture_btn_hover")
+Button/styles/normal = SubResource("StyleBoxTexture_btn_normal")
+Button/styles/pressed = SubResource("StyleBoxTexture_btn_pressed")
+CheckBox/colors/font_color = Color(0.95, 0.92, 0.85, 1)
+CheckBox/colors/font_hover_color = Color(1, 0.96, 0.9, 1)
+LineEdit/colors/font_color = Color(0.15, 0.1, 0.06, 1)
+LineEdit/colors/font_placeholder_color = Color(0.35, 0.28, 0.2, 0.7)
+LineEdit/styles/normal = SubResource("StyleBoxTexture_line_edit")
+PanelContainer/styles/panel = SubResource("StyleBoxTexture_panel")
