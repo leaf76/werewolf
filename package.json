@@ -11,10 +11,14 @@
     "deploy": "npm run build && wrangler deploy"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.18.4",
+    "@cloudflare/vitest-pool-workers": "^0.21.3",
     "esbuild": "^0.28.1",
     "typescript": "^7.0.2",
     "vitest": "~4.1.10",
-    "wrangler": "^4.110.0"
+    "wrangler": "^4.123.0"
+  },
+  "overrides": {
+    "nanoid": "3.3.18",
+    "postcss": "8.5.26"
   }
 }
